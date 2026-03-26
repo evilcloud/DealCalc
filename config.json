@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "salesPrice": 85000000,
+    "commission": 0,
+    "taxRate": 15,
+    "officialExpenses": 14000000,
+    "totalExpenses": 20000000,
+    "ceoBonusRate": 10,
+    "otherExpenses": 2000000
+  },
+  "presets": {
+    "Тан": {
+      "salesPrice": 65000000,
+      "commission": 0,
+      "taxRate": 15,
+      "officialExpenses": 14000000,
+      "totalExpenses": 20000000,
+      "ceoBonusRate": 10,
+      "otherExpenses": 2000000
+    },
+    "Дэвид": {
+      "salesPrice": 85000000,
+      "commission": 3000000,
+      "taxRate": 7,
+      "officialExpenses": 14000000,
+      "totalExpenses": 20000000,
+      "ceoBonusRate": 10,
+      "otherExpenses": 2000000
+    }
+  }
+}
