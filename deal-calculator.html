@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Калькулятор сделки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f5f0;
+    --white: #ffffff;
+    --border: #e0ddd8;
+    --text: #1a1a1a;
+    --text-secondary: #666;
+    --text-muted: #999;
+    --accent: #2563eb;
+    --green: #16a34a;
+    --red: #dc2626;
+    --radius: 14px;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .header {
+    padding: 36px 0 24px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Result banner ── */
+  .result-banner {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 20px 0;
+    margin-bottom: 12px;
+  }
+  .result-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .result-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .result-number.negative { color: var(--red); }
+
+  .result-breakdown {
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .rb-item {
+    padding: 14px 16px 14px 0;
+    border-right: 1px solid var(--border);
+  }
+  .rb-item:nth-child(even) {
+    border-right: none;
+    padding-left: 16px;
+    padding-right: 0;
+  }
+  .rb-item:nth-child(3),
+  .rb-item:nth-child(4) {
+    border-top: 1px solid var(--border);
+  }
+  .rb-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .rb-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+  .rb-value.red { color: var(--red); }
+  .rb-value.green { color: var(--green); }
+
+  /* ── Card ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Row ── */
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    min-height: 62px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .row:last-child { border-bottom: none; }
+
+  .row-label {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text);
+  }
+  .row-label small {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .row-input {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .row-prefix, .row-suffix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--text-muted);
+  }
+
+  input[type="text"], input[type="number"] {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text);
+    text-align: right;
+    width: 150px;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    caret-color: var(--accent);
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input:focus { color: var(--accent); }
+  input[readonly] { color: var(--text-muted); cursor: default; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #eff6ff;
+    color: var(--accent);
+    border: 1px solid #bfdbfe;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge.manual {
+    background: #fef2f2;
+    color: var(--red);
+    border-color: #fecaca;
+  }
+
+  .tax-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .tax-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 400;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .tax-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  @keyframes flash {
+    from { opacity: 0.4; }
+    to   { opacity: 1; }
+  }
+  .flash { animation: flash 0.2s ease-out; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header"><h1>Калькулятор сделки</h1></div>
+
+  <!-- Результат -->
+  <div class="result-banner">
+    <div class="result-label">Остаток</div>
+    <div class="result-number" id="r-remaining">—</div>
+    <div class="result-breakdown">
+      <div class="rb-item">
+        <div class="rb-label">После налога</div>
+        <div class="rb-value" id="r-posttax">—</div>
+      </div>
+      <div class="rb-item">
+        <div class="rb-label">Налог</div>
+        <div class="rb-value" id="r-tax">—</div>
+      </div>
+      <div class="rb-item">
+        <div class="rb-label">Комиссия</div>
+        <div class="rb-value" id="r-commission">—</div>
+      </div>
+      <div class="rb-item">
+        <div class="rb-label">Бонус CEO</div>
+        <div class="rb-value" id="r-ceobonus">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сделка -->
+  <div class="card">
+    <div class="card-title">Сделка</div>
+    <div class="row">
+      <div class="row-label">Цена продажи</div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-price" value="85 000 000">
+      </div>
+    </div>
+  </div>
+
+  <!-- Налог и расходы -->
+  <div class="card">
+    <div class="card-title">Налог и расходы</div>
+    <div class="row">
+      <div class="row-label">
+        Ставка налога
+        <small>от цены − офиц. расходы</small>
+      </div>
+      <div class="row-input tax-buttons">
+        <button class="tax-btn" data-val="0">0%</button>
+        <button class="tax-btn" data-val="7">7%</button>
+        <button class="tax-btn active" data-val="15">15%</button>
+        <input type="hidden" id="i-taxrate" value="15">
+      </div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        Официальные расходы
+        <small>вычитаются до налога</small>
+      </div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-officialexp" value="14 000 000">
+      </div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        Общие расходы
+        <small>вычитаются из базы бонуса</small>
+      </div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-totalexp" value="20 000 000">
+      </div>
+    </div>
+  </div>
+
+  <!-- Распределение -->
+  <div class="card">
+    <div class="card-title">Распределение</div>
+    <div class="row">
+      <div class="row-label">Комиссия</div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-commission" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        Ставка бонуса CEO
+        <small>от (после налога − комиссия − расходы)</small>
+      </div>
+      <div class="row-input">
+        <input type="number" id="i-ceoratepct" value="10" inputmode="decimal" step="0.1" style="width:70px">
+        <span class="row-suffix">%</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="row-label">Расчётный бонус CEO</div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-ceocalc" readonly tabindex="-1">
+      </div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        Выплаченный бонус
+        <span class="badge" id="link-badge">авто</span>
+      </div>
+      <div class="row-input">
+        <span class="row-prefix">$</span>
+        <input type="text" inputmode="numeric" id="i-ceobonus">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  const iPrice       = $('i-price');
+  const iCommission  = $('i-commission');
+  const iTaxRate     = $('i-taxrate');
+  const iOfficialExp = $('i-officialexp');
+  const iTotalExp    = $('i-totalexp');
+  const iCeoRatePct  = $('i-ceoratepct');
+  const iCeoCalc     = $('i-ceocalc');
+  const iCeoBonus    = $('i-ceobonus');
+
+  const rRemaining   = $('r-remaining');
+  const rTax         = $('r-tax');
+  const rCommission  = $('r-commission');
+  const rCeoBonus    = $('r-ceobonus');
+  const rPostTax     = $('r-posttax');
+  const linkBadge    = $('link-badge');
+
+  const SEP = '\u202F'; // narrow no-break space
+
+  // Format a number with space thousand separators
+  function addSeps(str) {
+    const clean = str.replace(/\D/g, '');
+    if (!clean) return '';
+    return clean.replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
+  }
+
+  // Parse a formatted string to float
+  function parse(str) {
+    return parseFloat(str.replace(/\s/g, '').replace(/\u202F/g, '')) || 0;
+  }
+
+  // Display format for result panel
+  function fmt(n) {
+    if (isNaN(n) || !isFinite(n)) return '—';
+    const neg = n < 0;
+    const abs = Math.abs(Math.round(n));
+    const str = abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, SEP);
+    return (neg ? '−$' : '$') + str;
+  }
+
+  // Set a text input's formatted value
+  function setFmt(input, n) {
+    const rounded = Math.round(n);
+    input.value = rounded ? addSeps(rounded.toString()) : '';
+  }
+
+  function flash(el) {
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+
+  // Dollar inputs that get thousand-separator treatment
+  const dollarInputs = [iPrice, iCommission, iOfficialExp, iTotalExp, iCeoBonus];
+
+  // On focus: strip separators so user sees plain digits
+  dollarInputs.forEach(inp => {
+    inp.addEventListener('focus', () => {
+      inp.value = inp.value.replace(/\u202F|\s/g, '');
+    });
+    // On blur: reformat
+    inp.addEventListener('blur', () => {
+      const n = parse(inp.value);
+      inp.value = n ? addSeps(inp.value.replace(/\D/g, '')) : (inp === iCommission ? '0' : inp.value);
+    });
+    // On input: allow only digits, then calc
+    inp.addEventListener('input', () => {
+      // strip non-digits (but keep current cursor flow — no reformatting mid-type)
+      const raw = inp.value.replace(/[^\d]/g, '');
+      // Only reformat on-the-fly if not focused to avoid caret jump
+      // We just store raw, recalc
+      if (inp !== iCeoBonus) {
+        calc();
+      }
+    });
+  });
+
+  let bonusLinked = true;
+
+  iCeoBonus.addEventListener('input', () => {
+    bonusLinked = false;
+    linkBadge.textContent = 'вручную';
+    linkBadge.classList.add('manual');
+    calc();
+  });
+
+  let lastTap = 0;
+  iCeoBonus.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTap < 350) {
+      bonusLinked = true;
+      linkBadge.textContent = 'авто';
+      linkBadge.classList.remove('manual');
+      calc();
+      e.preventDefault();
+    }
+    lastTap = now;
+  });
+  iCeoBonus.addEventListener('dblclick', () => {
+    bonusLinked = true;
+    linkBadge.textContent = 'авто';
+    linkBadge.classList.remove('manual');
+    calc();
+  });
+
+  // Tax buttons
+  document.querySelectorAll('.tax-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tax-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      iTaxRate.value = btn.dataset.val;
+      calc();
+    });
+  });
+
+  iCeoRatePct.addEventListener('input', calc);
+
+  function calc() {
+    const price       = parse(iPrice.value);
+    const commAmt     = parse(iCommission.value);
+    const taxRate     = parseFloat(iTaxRate.value)    || 0;
+    const officialExp = parse(iOfficialExp.value);
+    const totalExp    = parse(iTotalExp.value);
+    const ceoRate     = parseFloat(iCeoRatePct.value) || 0;
+
+    const taxBase      = price - officialExp;
+    const tax          = taxBase * (taxRate / 100);
+    const postTax      = price - tax;
+    const ceoBonusBase = postTax - commAmt - totalExp;
+    const ceoBonusCalc = ceoBonusBase * (ceoRate / 100);
+
+    setFmt(iCeoCalc, ceoBonusCalc);
+    if (bonusLinked) setFmt(iCeoBonus, ceoBonusCalc);
+
+    const ceoBonusPaid = parse(iCeoBonus.value);
+    const remaining    = price - tax - commAmt - ceoBonusPaid;
+
+    rRemaining.textContent  = fmt(remaining);
+    rRemaining.classList.toggle('negative', remaining < 0);
+    rTax.textContent        = fmt(tax);
+    rCommission.textContent = fmt(commAmt);
+    rCeoBonus.textContent   = fmt(ceoBonusPaid);
+    rPostTax.textContent    = fmt(postTax);
+
+    flash(rRemaining);
+  }
+
+  // Initial format of pre-filled inputs
+  dollarInputs.forEach(inp => {
+    const n = parse(inp.value);
+    if (n) inp.value = addSeps(n.toString());
+  });
+
+  calc();
+</script>
+</body>
+</html>
