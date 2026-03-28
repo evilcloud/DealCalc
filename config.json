@@ -21,7 +21,7 @@
     "Дэвид": {
       "salesPrice": 85000000,
       "commission": 3000000,
-      "taxRate": 7,
+      "taxRate": 0,
       "officialExpenses": 14000000,
       "totalExpenses": 20000000,
       "ceoBonusRate": 10,
