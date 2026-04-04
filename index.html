@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="DealCalc">
+  <meta name="format-detection" content="telephone=no">
   <title>Калькулятор сделки</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -11,7 +20,10 @@
 <body>
 <div class="wrap">
 
-  <div class="header"><h1>Калькулятор сделки</h1></div>
+  <div class="header">
+    <h1>Калькулятор сделки</h1>
+    <div id="install-hint" class="install-hint hidden">Safari → Поделиться → На экран «Домой» → Открывать как веб‑приложение</div>
+  </div>
 
   <div class="result-banner">
     <div class="result-label">Остаток</div>
@@ -42,7 +54,7 @@
       <div class="row-label">Цена продажи</div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-price">
+        <input type="text" inputmode="numeric" id="i-price" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
   </div>
@@ -55,9 +67,9 @@
         <small>от цены − офиц. расходы</small>
       </div>
       <div class="row-input tax-buttons">
-        <button class="tax-btn" data-val="0">0%</button>
-        <button class="tax-btn" data-val="7">7%</button>
-        <button class="tax-btn" data-val="15">15%</button>
+        <button class="tax-btn" type="button" data-val="0">0%</button>
+        <button class="tax-btn" type="button" data-val="7">7%</button>
+        <button class="tax-btn" type="button" data-val="15">15%</button>
         <input type="hidden" id="i-taxrate">
       </div>
     </div>
@@ -68,7 +80,7 @@
       </div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-officialexp">
+        <input type="text" inputmode="numeric" id="i-officialexp" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
     <div class="row">
@@ -78,7 +90,7 @@
       </div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-totalexp">
+        <input type="text" inputmode="numeric" id="i-totalexp" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
   </div>
@@ -88,11 +100,11 @@
     <div class="row">
       <div class="row-label">
         Комиссия
-        <button class="zero-btn" id="commission-zero">обнулить</button>
+        <button class="zero-btn" type="button" id="commission-zero">обнулить</button>
       </div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-commission">
+        <input type="text" inputmode="numeric" id="i-commission" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
     <div class="row">
@@ -102,7 +114,7 @@
       </div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-otherexp">
+        <input type="text" inputmode="numeric" id="i-otherexp" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
     <div class="row">
@@ -111,7 +123,7 @@
         <small>от (после налога − комиссия − общие расходы)</small>
       </div>
       <div class="row-input">
-        <input type="number" id="i-ceoratepct" inputmode="decimal" step="0.1" style="width:70px">
+        <input type="number" id="i-ceoratepct" inputmode="decimal" step="0.1" style="width:70px" autocomplete="off" enterkeyhint="done">
         <span class="row-suffix">%</span>
       </div>
     </div>
@@ -129,16 +141,14 @@
       </div>
       <div class="row-input">
         <span class="row-prefix">$</span>
-        <input type="text" inputmode="numeric" id="i-ceobonus">
+        <input type="text" inputmode="numeric" id="i-ceobonus" autocomplete="off" enterkeyhint="done">
       </div>
     </div>
   </div>
 
-  <!-- Пресеты — генерируются из config.js -->
   <div class="presets" id="presets-container"></div>
 
 </div>
-<!-- KEEP IN SYNC WITH config.json — used as fallback when fetch is unavailable -->
 <script id="inline-config" type="application/json">
 {
   "defaults": {
@@ -162,12 +172,13 @@
     },
     "Дэвид": {
       "salesPrice": 85000000,
-      "commission": 3000000,
-      "taxRate": 7,
+      "commission": 1700000,
+      "taxRate": 0,
       "officialExpenses": 14000000,
       "totalExpenses": 20000000,
       "ceoBonusRate": 10,
-      "otherExpenses": 2000000
+      "otherExpenses": 4250000,
+      "ceoBonusPaid": 7000000
     }
   }
 }

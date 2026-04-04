@@ -41,7 +41,7 @@ const iCommission  = $('i-commission');
 const iTaxRate     = $('i-taxrate');
 const iOfficialExp = $('i-officialexp');
 const iTotalExp    = $('i-totalexp');
-var iOtherExp    = $('i-otherexp');
+var iOtherExp      = $('i-otherexp');
 const iCeoRatePct  = $('i-ceoratepct');
 const iCeoCalc     = $('i-ceocalc');
 const iCeoBonus    = $('i-ceobonus');
@@ -52,6 +52,7 @@ const rCommission  = $('r-commission');
 const rCeoBonus    = $('r-ceobonus');
 const rPostTax     = $('r-posttax');
 const linkBadge    = $('link-badge');
+const installHint  = $('install-hint');
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -187,6 +188,7 @@ function buildPresets(presets) {
   container.innerHTML = '';
   Object.keys(presets).forEach(function(name) {
     var btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'preset-btn';
     btn.textContent = name;
     btn.addEventListener('click', function() {
@@ -196,14 +198,21 @@ function buildPresets(presets) {
   });
 }
 
+function updateInstallHint() {
+  if (!installHint) return;
+  var isiPhone = /iPhone/i.test(navigator.userAgent || '');
+  var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  installHint.classList.toggle('hidden', !isiPhone || standalone);
+}
+
 // ── Boot — fetch config.json then initialise ──────────────────────────────────
 
 // Read config from the inline <script id="inline-config"> block in index.html.
-// On Vercel, fetch() keeps it in sync with config.json.
+// On a hosted build, fetch() keeps it in sync with config.json.
 // Locally (file://) the inline block is used directly.
 
 function loadConfig(callback) {
-  fetch('config.json')
+  fetch('config.json', { cache: 'no-store' })
     .then(function(r) { return r.json(); })
     .then(callback)
     .catch(function() {
@@ -213,7 +222,11 @@ function loadConfig(callback) {
     });
 }
 
+window.addEventListener('pageshow', updateInstallHint);
+window.addEventListener('orientationchange', updateInstallHint);
+
 loadConfig(function(config) {
+  updateInstallHint();
   buildPresets(config.presets);
   applyToCalc(config.defaults);
 });
