@@ -25,7 +25,8 @@
       "officialExpenses": 14000000,
       "totalExpenses": 20000000,
       "ceoBonusRate": 10,
-      "otherExpenses": 4250000
+      "otherExpenses": 4250000,
+      "ceoBonusPaid": 3000000
     }
   }
 }
