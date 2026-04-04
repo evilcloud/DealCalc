@@ -167,9 +167,16 @@ function applyToCalc(cfg) {
   document.querySelectorAll('.tax-btn').forEach(function(b) {
     b.classList.toggle('active', Number(b.dataset.val) === cfg.taxRate);
   });
-  bonusLinked = true;
-  linkBadge.textContent = 'авто';
-  linkBadge.classList.remove('manual');
+  if (cfg.ceoBonusPaid != null) {
+    bonusLinked = false;
+    setFmt(iCeoBonus, cfg.ceoBonusPaid);
+    linkBadge.textContent = 'вручную';
+    linkBadge.classList.add('manual');
+  } else {
+    bonusLinked = true;
+    linkBadge.textContent = 'авто';
+    linkBadge.classList.remove('manual');
+  }
   calc();
 }
 
